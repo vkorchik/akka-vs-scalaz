@@ -1,10 +1,13 @@
 package com.softwaremill.capper
 
+import monix.eval.MVar
+import monix.execution.Scheduler.Implicits.global
 import org.scalatest.concurrent.{Eventually, ScalaFutures}
 import org.scalatest.{Matchers, WordSpecLike}
 
 import scala.concurrent.Future
-import concurrent.duration._
+import scala.concurrent.duration._
+import scala.util.Random
 
 trait CapperTest extends Matchers with WordSpecLike with Eventually with ScalaFutures {
 
@@ -39,16 +42,24 @@ trait CapperTest extends Matchers with WordSpecLike with Eventually with ScalaFu
           (1 to 10).foreach(i => capper.getInfo(i.toString).futureValue shouldBe defined)
         }
 
-        val map1 = (1 to 10).map(i => capper.getInfo(i.toString).futureValue.get)
+        //        val map1 = (1 to 10).map(i => capper.getInfo(i.toString).futureValue.get)
 
-        capper.update()
-        eventually {
-          (1 to 10).foreach(i => capper.getInfo(i.toString).futureValue shouldBe defined)
+        (1 to 10) foreach { i =>
+          println(s"$i iteration")
+          capper.update()
+          Thread.sleep(2000)
+          //          val res = capper.getInfo(i.toString)
+          //          res onComplete {
+          //            case Success(r) => println(r)
+          //            case _ => println("failure")
+          //          }
         }
-
-        val map2 = (1 to 10).map(i => capper.getInfo(i.toString).futureValue.get)
-
-        map1 shouldNot be(map2)
+        //        eventually {
+        //          (1 to 10).foreach(i => capper.getInfo(i.toString).futureValue shouldBe defined)
+        //        }
+        //
+        //        val map2 = (1 to 10).map(i => capper.getInfo(i.toString).futureValue.get)
+        //        map1 shouldNot be(map2)
       }
     }
   }

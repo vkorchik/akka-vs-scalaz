@@ -9,6 +9,7 @@ import akka.util.Timeout
 
 import concurrent.ExecutionContext.Implicits.global
 import concurrent.duration._
+import scala.io.Source
 
 object UsingAkka {
 
@@ -37,7 +38,15 @@ object UsingAkka {
     override def receive = {
       case GetInfo(id) => sender ! Info(info.map.get(id))
       case Update =>
-        info = CappingInfo((1 to 10).map(i => i.toString -> Random.nextInt(i)).toMap)
+        println("received")
+        info = loadInfo
+    }
+
+    private def loadInfo(): CappingInfo = {
+      val str = Source.fromFile("info.txt").getLines().mkString
+      println(str)
+
+      CappingInfo((1 to 10).map(i => i.toString -> Random.nextInt(i)).toMap)
     }
   }
 

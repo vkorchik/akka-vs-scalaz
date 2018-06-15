@@ -5,6 +5,7 @@ import akka.actor.typed.scaladsl.{Behaviors, TimerScheduler}
 
 import scala.concurrent.{Await, Future, Promise}
 import concurrent.duration._
+import scala.io.Source
 import scala.util.Random
 
 object UsingAkkaTyped {
@@ -38,9 +39,17 @@ object UsingAkkaTyped {
           p.success(data.map.get(id))
           capInfo(timer, data)
         case Update =>
-          val newInfo = CappingInfo((1 to 10).map(i => i.toString -> Random.nextInt(i)).toMap)
+          println("received")
+          val newInfo = loadInfo()
           capInfo(timer, newInfo)
       }
+    }
+
+    private def loadInfo(): CappingInfo = {
+      val str = Source.fromFile("info.txt").getLines().mkString
+      println(str)
+
+      CappingInfo((1 to 10).map(i => i.toString -> Random.nextInt(i)).toMap)
     }
   }
 
